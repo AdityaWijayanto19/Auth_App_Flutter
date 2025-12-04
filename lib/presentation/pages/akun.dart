@@ -42,10 +42,8 @@ class _AkunState extends State<Akun> {
         _avatarFile = file;
       });
 
-      // /// Upload ke Supabase
       await AuthService().updateProfile(newAvatarFile: file);
 
-      /// Refresh UI
       await _loadProfile();
 
       if (!mounted) return;

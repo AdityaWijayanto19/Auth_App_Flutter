@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-// Anda mungkin perlu menyesuaikan import untuk 'login_form.dart' dan 'welcome.dart'
-// sesuai dengan struktur folder Anda.
-
-// Import yang dibutuhkan dari file reset_password yang lama
-import 'login.dart'; // Ganti dengan path yang benar
-
+import 'login.dart'; 
 
 class LupaPassword extends StatefulWidget {
   const LupaPassword({super.key});

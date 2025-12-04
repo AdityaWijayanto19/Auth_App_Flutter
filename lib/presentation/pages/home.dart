@@ -27,7 +27,6 @@ class _HomeState extends State<Home> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // 1. Panggil Widget Header di sini
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: _emptyState(

@@ -194,11 +194,11 @@ class _SettingState extends State<Setting> {
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Batal'),
+                              child: const Text('Batal', style: TextStyle(color: Colors.black),),
                             ),
                             TextButton(
                               onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Keluar'),
+                              child: const Text('Keluar', style: TextStyle(color: Colors.black)),
                             ),
                           ],
                         ),
