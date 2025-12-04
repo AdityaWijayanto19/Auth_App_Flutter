@@ -49,25 +49,26 @@ class _LoginState extends State<LoginForm> {
         password: _passwordC.text.trim(),
       );
 
-      setState(() {
-        _info = 'Login berhasil';
-      });
-
       print("berhasil login: ${res.session != null}");
-      if (res.session == null) {
+
+      if (res.session != null) {
         setState(() {
-          _error = "Akun belum terverifikasi. Silakan cek email.";
+          _isLoading = false;
         });
 
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (_) => const Home()),
         );
-
-        return;
+      } else {
+        setState(() {
+          _isLoading = false;
+          _error = "Akun belum terverifikasi. Silakan cek email.";
+        });
       }
     } catch (e) {
       setState(() {
+        _isLoading = false;
         _error = "Terjadi kesalahan, coba lagi";
       });
     }
@@ -197,13 +198,15 @@ class _LoginState extends State<LoginForm> {
                             MaterialPageRoute(builder: (context) => Register()),
                           );
                         },
-                        style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 5)),
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.symmetric(horizontal: 5),
+                        ),
                         child: Text(
                           'Daftar Akun',
                           style: TextStyle(
                             color: Colors.deepOrange,
                             decoration: TextDecoration.underline,
-                            decorationColor: Colors.deepOrange
+                            decorationColor: Colors.deepOrange,
                           ),
                         ),
                       ),

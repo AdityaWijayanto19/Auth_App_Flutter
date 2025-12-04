@@ -52,7 +52,8 @@ class AuthService {
     if (avatarFile != null) {
       final fileExt = avatarFile.path.split('.').last;
       // Perbaikan: Gunakan path unik, tidak hanya userId.
-      final filePath = 'avatars/$userId/${DateTime.now().millisecondsSinceEpoch}.$fileExt'; 
+      final filePath =
+          'avatars/$userId/${DateTime.now().millisecondsSinceEpoch}.$fileExt';
 
       await _supabase.storage
           .from('avatars')
@@ -64,7 +65,7 @@ class AuthService {
 
       avatarUrl = _supabase.storage.from('avatars').getPublicUrl(filePath);
     }
-    
+
     // 3. TAHAP DATABASE (Insert ke Tabel profiles)
     try {
       final insertResponse = await _supabase.from('profiles').insert({
@@ -72,17 +73,18 @@ class AuthService {
         'full_name': fullName, // Pastikan ini match dengan nama kolom Anda
         'avatar_url': avatarUrl, // Pastikan ini match dengan nama kolom Anda
         // WAJIB: Tambahkan 'updated_at' jika ada di skema Anda.
-        // 'updated_at': DateTime.now().toIso8601String(), 
+        // 'updated_at': DateTime.now().toIso8601String(),
       }).select();
-      
-      // Print respon jika berhasil (untuk memastikan data kembali)
-      print("INSERT RESPONSE => $insertResponse"); 
 
+      // Print respon jika berhasil (untuk memastikan data kembali)
+      print("INSERT RESPONSE => $insertResponse");
     } on PostgrestException catch (e) {
       // Jika terjadi kesalahan di RLS atau Schema
       print("POSTGREST (DB) ERROR: ${e.message}");
       // Melempar exception yang lebih spesifik untuk ditangkap di UI
-      throw Exception('Gagal menyimpan profil (RLS/Schema Error): ${e.message}');
+      throw Exception(
+        'Gagal menyimpan profil (RLS/Schema Error): ${e.message}',
+      );
     } catch (e) {
       // Jika error lain
       throw Exception('Kesalahan tak terduga saat menyimpan profil: $e');
@@ -98,19 +100,24 @@ class AuthService {
   String? getCurrentUserEmail() {
     return _supabase.auth.currentUser?.email;
   }
-  
-  // dapatkan profile user yang sedang login
-  Future<Map<String, dynamic>?> getProfile() async {
-    final user = _supabase.auth.currentUser;
-    if (user == null) return null;
 
-    final result = await _supabase
+  // dapatkan profile user yang sedang login
+  Future<Map<String, dynamic>> getProfile() async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw Exception('Not logged in');
+
+    final profile = await _supabase
         .from('profiles')
         .select()
         .eq('id', user.id)
         .maybeSingle();
 
-    return result;
+    return {
+      "id": user.id,
+      "email": user.email,
+      "full_name": profile?['full_name'],
+      "avatar_url": profile?['avatar_url'],
+    };
   }
 
   // fungsi update data user/profile

@@ -1,21 +1,43 @@
 import 'package:flutter/material.dart';
+import '../../service/auth_service.dart';
+import '../pages/setting.dart';
 
-class Header extends StatelessWidget {
-  final String username;
-  final String profileImageUrl;
-  final VoidCallback? onSettingsTap;
+class Header extends StatefulWidget {
+  const Header({super.key});
 
-  const Header({
-    super.key,
-    this.username = "Itami",
-    this.profileImageUrl = 'https://i.imgur.com/BoN9kdC.png',
-    this.onSettingsTap,
-  });
+  @override
+  State<Header> createState() => _HeaderState();
+}
+
+class _HeaderState extends State<Header> {
+  Map<String, dynamic>? _profile;
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProfile();
+  }
+
+  Future<void> _loadProfile() async {
+    final data = await AuthService().getProfile();
+    setState(() {
+      _profile = data;
+      _loading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final Color primaryOrange = const Color(0xFFFF5024);
     final Color textDark = const Color(0xFF2D2D2D);
+
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    final name = _profile?['full_name'] ?? 'No Name';
+    final avatar = _profile?['avatar_url'];
 
     return Column(
       children: [
@@ -25,36 +47,42 @@ class Header extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
           child: Row(
             children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  image: DecorationImage(
-                    image: NetworkImage(profileImageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+              // ==================== AVATAR ====================
+              CircleAvatar(
+                radius: 25,
+                backgroundColor: Colors.grey.shade300,
+                backgroundImage: avatar != null ? NetworkImage(avatar) : null,
+                child: avatar == null
+                    ? const Icon(Icons.person, size: 30, color: Colors.white)
+                    : null,
               ),
+
               const SizedBox(width: 12),
 
+              // ==================== NAME ====================
               Text(
-                username,
+                name,
                 style: TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 18,
                   color: textDark,
                 ),
               ),
+
               const SizedBox(width: 4),
               const Text("🔥", style: TextStyle(fontSize: 20)),
 
               const Spacer(),
 
+              // ==================== SETTINGS ====================
               InkWell(
-                onTap: onSettingsTap,
+                onTap: () async {
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const Setting()),
+                  );
+                },
                 child: Container(
-                  color: Colors.transparent,
                   padding: const EdgeInsets.all(4),
                   child: Icon(
                     Icons.settings_outlined,

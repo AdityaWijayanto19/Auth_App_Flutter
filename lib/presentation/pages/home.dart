@@ -22,18 +22,7 @@ class _HomeState extends State<Home> {
       body: Stack(
         children: [
           // ====== KONTEN DASHBOARD ======
-          Header(
-            username: "Aditya",
-            profileImageUrl: "https://i.imgur.com/BoN9kdC.png",
-
-            /// 👉 di sini aksi klik foto profil
-            onSettingsTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const Setting()),
-              );
-            },
-          ),
+          Header(),
           Positioned.fill(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
