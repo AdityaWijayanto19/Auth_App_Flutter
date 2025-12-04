@@ -47,7 +47,7 @@ class _SettingState extends State<Setting> {
         elevation: 0,
         centerTitle: true,
         leading: IconButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context, true),
           icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
         ),
         title: const Text(
@@ -127,12 +127,16 @@ class _SettingState extends State<Setting> {
                       color: Colors.black,
                       size: 16,
                     ),
-                    onTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (context) => const Akun(),
-                      ),
-                    ),
+                    onTap: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Akun()),
+                      );
+
+                      if (result == true) {
+                        _loadProfile(); 
+                      }
+                    },
                   ),
                   const SizedBox(height: 8),
                   _buildPengaturanItem(

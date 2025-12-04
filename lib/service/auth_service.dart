@@ -121,10 +121,7 @@ class AuthService {
   }
 
   // fungsi update data user/profile
-  Future<void> updateProfile({
-    required String fullName,
-    File? newAvatarFile,
-  }) async {
+  Future<void> updateProfile({String? fullName, File? newAvatarFile}) async {
     final user = _supabase.auth.currentUser;
     if (user == null) {
       throw AuthException('Tidak ada user yang login.');
@@ -156,8 +153,8 @@ class AuthService {
   }
 
   // ubah password
-  Future<void> changePassword(String newPassword) async {
-    await _supabase.auth.updateUser(UserAttributes(password: newPassword));
+  Future<void> changePassword({required String password}) async {
+    await _supabase.auth.updateUser(UserAttributes(password: password));
   }
 
   // lupa password via email

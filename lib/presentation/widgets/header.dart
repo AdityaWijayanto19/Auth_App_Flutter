@@ -77,11 +77,17 @@ class _HeaderState extends State<Header> {
               // ==================== SETTINGS ====================
               InkWell(
                 onTap: () async {
-                  await Navigator.push(
+                  final updated = await Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const Setting()),
                   );
+
+                  if (updated == true) {
+                    await _loadProfile();
+                    setState(() {});
+                  }
                 },
+
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   child: Icon(
