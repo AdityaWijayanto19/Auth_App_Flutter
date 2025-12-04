@@ -197,11 +197,13 @@ class _LoginState extends State<LoginForm> {
                             MaterialPageRoute(builder: (context) => Register()),
                           );
                         },
+                        style: TextButton.styleFrom(padding: EdgeInsets.symmetric(horizontal: 5)),
                         child: Text(
                           'Daftar Akun',
                           style: TextStyle(
                             color: Colors.deepOrange,
                             decoration: TextDecoration.underline,
+                            decorationColor: Colors.deepOrange
                           ),
                         ),
                       ),

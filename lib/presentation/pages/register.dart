@@ -47,14 +47,6 @@ class _RegisterPageState extends State<Register> {
       return;
     }
 
-    // if (_avatarFile == null) {
-    //   setState(() {
-    //     _error = 'Foto profil wajib dipilih.';
-    //     _info = null;
-    //   });
-    //   return;
-    // }
-
     setState(() {
       _isLoading = true;
       _error = null;
@@ -75,21 +67,26 @@ class _RegisterPageState extends State<Register> {
 
       // Kalau mau langsung arahkan ke halaman login:
       // Navigator.pushReplacement(
-      //   context,
-      //   MaterialPageRoute(builder: (_) => const LoginForm()),
+      // 	 context,
+      // 	 MaterialPageRoute(builder: (_) => const LoginForm()),
       // );
 
     } on AuthException catch (e) {
       setState(() {
-        _error = 'Auth error: ${e.message}';
+        _error = 'Autentikasi Gagal: ${e.message}';
       });
     } on StorageException catch (e) {
       setState(() {
-        _error = 'Storage error: ${e.message}';
+        _error = 'Storage Error: ${e.message}. Akun berhasil dibuat, tetapi avatar gagal diunggah.';
+      });
+    } on Exception catch (e) {
+      // Menangkap exception yang dilempar dari AuthService (misalnya PostgrestException)
+      setState(() {
+        _error = e.toString().replaceFirst('Exception: ', '');
       });
     } catch (e) {
       setState(() {
-        _error = 'Terjadi kesalahan, coba lagi.';
+        _error = 'Terjadi kesalahan tidak terduga, coba lagi.';
       });
     } finally {
       setState(() {
@@ -205,11 +202,13 @@ class _RegisterPageState extends State<Register> {
                       Text(
                         _error!,
                         style: const TextStyle(color: Colors.red),
+                        textAlign: TextAlign.center,
                       ),
                     if (_info != null)
                       Text(
                         _info!,
                         style: const TextStyle(color: Colors.green),
+                        textAlign: TextAlign.center,
                       ),
 
                     const SizedBox(height: 80),
@@ -241,7 +240,8 @@ class _RegisterPageState extends State<Register> {
                       ? const SizedBox(
                           height: 22,
                           width: 22,
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
                         )
                       : const Text(
                           'Daftar',
@@ -291,8 +291,8 @@ class _RegisterPageState extends State<Register> {
               keyboardType: keyboardType,
               cursorColor: Colors.deepOrange,
               decoration: InputDecoration(
-                labelText: label,
-                prefixIcon: Icon(icon),
+                label: Text(label),
+                prefixIcon: Icon(icon, color: hasFocus ? Colors.deepOrange : Colors.grey),
                 suffixIcon: suffixIcon != null
                     ? GestureDetector(
                         onTap: onSuffixTap,
@@ -314,6 +314,12 @@ class _RegisterPageState extends State<Register> {
                     width: 1.5,
                   ),
                 ),
+                enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Colors.grey.shade300,
+                      width: 1,
+                    )),
               ),
             ),
           );

@@ -31,7 +31,7 @@ class AuthService {
     required String fullName,
     File? avatarFile,
   }) async {
-    // create data user
+    // 1. TAHAP AUTHENTICATION (Membuat Akun Pengguna)
     final authResponse = await _supabase.auth.signUp(
       email: email,
       password: password,
@@ -46,11 +46,13 @@ class AuthService {
 
     final userId = user.id;
 
+    // 2. TAHAP STORAGE (Upload Avatar)
     // kalo ada avatar upload ke storage
     String? avatarUrl;
     if (avatarFile != null) {
       final fileExt = avatarFile.path.split('.').last;
-      final filePath = 'avatars/$userId.$fileExt';
+      // Perbaikan: Gunakan path unik, tidak hanya userId.
+      final filePath = 'avatars/$userId/${DateTime.now().millisecondsSinceEpoch}.$fileExt'; 
 
       await _supabase.storage
           .from('avatars')
@@ -62,13 +64,29 @@ class AuthService {
 
       avatarUrl = _supabase.storage.from('avatars').getPublicUrl(filePath);
     }
+    
+    // 3. TAHAP DATABASE (Insert ke Tabel profiles)
+    try {
+      final insertResponse = await _supabase.from('profiles').insert({
+        'id': userId,
+        'full_name': fullName, // Pastikan ini match dengan nama kolom Anda
+        'avatar_url': avatarUrl, // Pastikan ini match dengan nama kolom Anda
+        // WAJIB: Tambahkan 'updated_at' jika ada di skema Anda.
+        // 'updated_at': DateTime.now().toIso8601String(), 
+      }).select();
+      
+      // Print respon jika berhasil (untuk memastikan data kembali)
+      print("INSERT RESPONSE => $insertResponse"); 
 
-    // masukkan data ke tabel profiles
-    await _supabase.from('profiles').insert({
-      'id': userId,
-      'full_name': fullName,
-      'avatar_url': avatarUrl,
-    });
+    } on PostgrestException catch (e) {
+      // Jika terjadi kesalahan di RLS atau Schema
+      print("POSTGREST (DB) ERROR: ${e.message}");
+      // Melempar exception yang lebih spesifik untuk ditangkap di UI
+      throw Exception('Gagal menyimpan profil (RLS/Schema Error): ${e.message}');
+    } catch (e) {
+      // Jika error lain
+      throw Exception('Kesalahan tak terduga saat menyimpan profil: $e');
+    }
   }
 
   // sign out/keluar
@@ -77,6 +95,11 @@ class AuthService {
   }
 
   // dapatkan id user yang sedang login
+  String? getCurrentUserEmail() {
+    return _supabase.auth.currentUser?.email;
+  }
+  
+  // dapatkan profile user yang sedang login
   Future<Map<String, dynamic>?> getProfile() async {
     final user = _supabase.auth.currentUser;
     if (user == null) return null;
